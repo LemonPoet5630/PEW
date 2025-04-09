@@ -22,8 +22,7 @@ public partial class MapManager: Node2D
     public string chosenNationTag;
     private const float SNAP_EPSILON = 0.001f; // Optional: tiny snap during input
 
-    public override void _Ready()
-    {
+    public override void _Ready() {
         base._Ready();
         Instance = this;
         currentlyShownNationTag = "";
@@ -73,13 +72,11 @@ public partial class MapManager: Node2D
         GD.Print(chosenNationTag);
     }
     //=================================================================
-    public void ToggleConnections()
-    {
+    public void ToggleConnections() {
         ConnectionLinesParent.Visible = !ConnectionLinesParent.Visible;
     }
 
-    public void CreateConnectionLine(string state1Name, string state2Name)
-    {
+    public void CreateConnectionLine(string state1Name, string state2Name) {
         Vector2 coor1 = Tools.FindCentroid(StateManager.States_Name[state1Name]);
         Vector2 coor2 = Tools.FindCentroid(StateManager.States_Name[state2Name]);
         var line = ConnectionLinePrefab.Instantiate();
@@ -90,8 +87,7 @@ public partial class MapManager: Node2D
         ConnectionLinesParent.AddChild(line);
     }
 
-    public void DeleteConnectionLine(string state1Name)
-    {
+    public void DeleteConnectionLine(string state1Name) {
         foreach (Line2D line in ConnectionLinesParent.GetChildren())
         {
             if (line.Name.ToString().Contains(state1Name))
@@ -127,8 +123,7 @@ public partial class MapManager: Node2D
         }
 
     }
-    public void CreateNationBorderLine(string nationTag)
-    {
+    public void CreateNationBorderLine(string nationTag) {
         List<List<Vector2>> polygons = [];
         foreach (State state in NationManager.Nations_Tag[nationTag].ControlledStates) {
             //CreateStateBorderLine(state.Name);
@@ -139,8 +134,7 @@ public partial class MapManager: Node2D
 
         List<List<Vector2>> outlines = FindNationOutline(polygons);
 
-        foreach (List<Vector2> path in outlines)
-        {
+        foreach (List<Vector2> path in outlines) {
             Line2D line = new Line2D();
             line.Points = [.. path];
             line.Closed = true;
@@ -150,13 +144,11 @@ public partial class MapManager: Node2D
         }
     }
 
-    private struct CanonicalEdge
-    {
+    private struct CanonicalEdge {
         public Vector2 A;
         public Vector2 B;
 
-        public CanonicalEdge(Vector2 a, Vector2 b)
-        {
+        public CanonicalEdge(Vector2 a, Vector2 b) {
             if (a < b)
             {
                 A = a;
@@ -169,25 +161,21 @@ public partial class MapManager: Node2D
             }
         }
 
-        public override bool Equals(object obj)
-        {
+        public override bool Equals(object obj) {
             return obj is CanonicalEdge other && A == other.A && B == other.B;
         }
 
-        public override int GetHashCode()
-        {
+        public override int GetHashCode() {
             return 1;
         }
     }
-    private static Vector2 Snap(Vector2 v)
-    {
+    private static Vector2 Snap(Vector2 v) {
         return new Vector2(
             Mathf.Round(v.X / SNAP_EPSILON) * SNAP_EPSILON,
             Mathf.Round(v.Y / SNAP_EPSILON) * SNAP_EPSILON
         );
     }
-    private static List<List<Vector2>> FindNationOutline(List<List<Vector2>> polygons)
-    {
+    private static List<List<Vector2>> FindNationOutline(List<List<Vector2>> polygons) {
         Dictionary<CanonicalEdge, int> edgeCounts = new Dictionary<CanonicalEdge, int>();
 
         foreach (List<Vector2> polygon in polygons)
@@ -214,12 +202,10 @@ public partial class MapManager: Node2D
 
         return StitchEdgesIntoPaths(boundaryEdges);
     }
-    private static List<List<Vector2>> StitchEdgesIntoPaths(List<CanonicalEdge> edges)
-    {
+    private static List<List<Vector2>> StitchEdgesIntoPaths(List<CanonicalEdge> edges) {
         Dictionary<Vector2, List<Vector2>> adjacency = new Dictionary<Vector2, List<Vector2>>();
 
-        foreach (var edge in edges)
-        {
+        foreach (var edge in edges) {
             if (!adjacency.ContainsKey(edge.A))
                 adjacency[edge.A] = new List<Vector2>();
             if (!adjacency.ContainsKey(edge.B))
@@ -231,8 +217,7 @@ public partial class MapManager: Node2D
 
         List<List<Vector2>> outlines = new List<List<Vector2>>();
 
-        while (adjacency.Count > 0)
-        {
+        while (adjacency.Count > 0) {
             Vector2 start = adjacency.Keys.First();
             List<Vector2> path = new List<Vector2>();
             path.Add(start);
